@@ -104,7 +104,7 @@ function useNarrationFile() {
 // ── Player: one audio element slaved to the timeline ───────────────────────
 // offset > 0 delays the narration relative to the visuals (audio plays the
 // moment that is `offset` seconds EARLIER than the playhead).
-function FileVoiceOver({ enabled, rate = 1, offset = 0, muted = false }) {
+function FileVoiceOver({ enabled, rate = 1, offset = 0, muted = false, volume = 1 }) {
   const { time, playing } = useTimeline();
   const entry = useNarrationFile();
   const audioRef = React.useRef(null);
@@ -112,6 +112,8 @@ function FileVoiceOver({ enabled, rate = 1, offset = 0, muted = false }) {
   offsetRef.current = offset;
   const mutedRef = React.useRef(muted);
   mutedRef.current = muted;
+  const volRef = React.useRef(volume);
+  volRef.current = volume;
 
   const url = entry ? entry.url : null;
 
@@ -121,14 +123,18 @@ function FileVoiceOver({ enabled, rate = 1, offset = 0, muted = false }) {
     const a = new Audio(url);
     a.preload = 'auto';
     a.muted = mutedRef.current;
+    a.volume = clamp(volRef.current, 0, 1);
     audioRef.current = a;
     return () => { try { a.pause(); } catch {} if (audioRef.current === a) audioRef.current = null; };
   }, [url]);
 
-  // Mute silences the element but playback keeps tracking the timeline.
+  // Mute/volume change the audible output but playback keeps tracking the timeline.
   React.useEffect(() => {
-    if (audioRef.current) audioRef.current.muted = muted;
-  }, [muted, url]);
+    if (audioRef.current) {
+      audioRef.current.muted = muted;
+      audioRef.current.volume = clamp(volume, 0, 1);
+    }
+  }, [muted, volume, url]);
 
   // Follow play/pause + enabled.
   React.useEffect(() => {

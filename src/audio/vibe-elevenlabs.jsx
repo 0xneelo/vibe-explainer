@@ -132,7 +132,7 @@ function useElApiKey() {
 }
 
 // ── Narration player: paces the timeline on the real audio ──────────────────
-function ElevenLabsVoiceOver({ items, enabled, apiKey, voiceLabel, rate = 1, muted = false }) {
+function ElevenLabsVoiceOver({ items, enabled, apiKey, voiceLabel, rate = 1, muted = false, volume = 1 }) {
   const { time, playing } = useTimeline();
   const voiceId = elVoiceId(voiceLabel);
   const prevTimeRef = React.useRef(time);
@@ -143,13 +143,18 @@ function ElevenLabsVoiceOver({ items, enabled, apiKey, voiceLabel, rate = 1, mut
   playingRef.current = playing;
   const rateRef = React.useRef(rate);
   rateRef.current = rate;
-  // Mute keeps the clip playing silently so the clock gate still paces the
-  // timeline exactly the same — only the audible output is cut.
+  // Mute/volume keep the clip playing (silently/quieter) so the clock gate
+  // still paces the timeline exactly the same — only the audible output changes.
   const mutedRef = React.useRef(muted);
   mutedRef.current = muted;
+  const volRef = React.useRef(volume);
+  volRef.current = volume;
   React.useEffect(() => {
-    if (audioRef.current) audioRef.current.muted = muted;
-  }, [muted]);
+    if (audioRef.current) {
+      audioRef.current.muted = muted;
+      audioRef.current.volume = clamp(volume, 0, 1);
+    }
+  }, [muted, volume]);
 
   const stopAudio = () => {
     const a = audioRef.current;
@@ -222,6 +227,7 @@ function ElevenLabsVoiceOver({ items, enabled, apiKey, voiceLabel, rate = 1, mut
           const a = new Audio(entry.url);
           a.playbackRate = clamp(rateRef.current, 0.5, 2);
           a.muted = mutedRef.current;
+          a.volume = clamp(volRef.current, 0, 1);
           a.onended = release;
           a.onerror = release;
           audioRef.current = a;
@@ -233,7 +239,7 @@ function ElevenLabsVoiceOver({ items, enabled, apiKey, voiceLabel, rate = 1, mut
           if (window.speechSynthesis) {
             const u = new SpeechSynthesisUtterance(line.text);
             u.rate = clamp(rateRef.current, 0.5, 2);
-            u.volume = mutedRef.current ? 0 : 1;
+            u.volume = mutedRef.current ? 0 : clamp(volRef.current, 0, 1);
             u.onend = release;
             u.onerror = release;
             speechSynthesis.speak(u);

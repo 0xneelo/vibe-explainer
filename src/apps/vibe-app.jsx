@@ -113,8 +113,25 @@ const VIBE_CAPTIONS_REAL = INTRO_CAPTIONS.concat(VIBE_CAPTIONS.map((c) => ({
   t2: Math.round(((c.t + INTRO_SCENE) * SLIDE_SLOW + (c.t2 - c.t)) * 10) / 10,
 })));
 
+// Persistent brand mark: white duck on an accent circle, pinned to the
+// top-right corner of the canvas on every frame (visible in recordings too).
+function CornerDuck() {
+  return (
+    <div style={{
+      position: 'absolute', top: 34, right: 38, width: 96, height: 96,
+      borderRadius: '50%', background: 'var(--accent)',
+      boxShadow: '0 0 0 7px var(--accent-soft)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      pointerEvents: 'none', zIndex: 5,
+    }}>
+      <img src={(window.__resources && window.__resources.vibeDuck) || 'assets/images/vibe-duck.svg'}
+        alt="" style={{ width: '62%', height: '62%' }}></img>
+    </div>
+  );
+}
+
 function VibeMovie({ items, captionsOn, voiceoverOn, voice, speed, engine, elVoice, elKey,
-  musicOn, musicStyle, musicVol, narrOffset, muted = false, admin = false }) {
+  musicOn, musicStyle, musicVol, narrOffset, muted = false, volume = 1, admin = false }) {
   const t = useTime();
   const narrFile = useNarrationFile();
   const elCached = useElCachedCount(items, elVoiceId(elVoice));
@@ -137,8 +154,9 @@ function VibeMovie({ items, captionsOn, voiceoverOn, voice, speed, engine, elVoi
           <Scene9></Scene9>
         </TimeShift>
       </TimeScale>
+      <CornerDuck></CornerDuck>
       <Captions items={items} visible={captionsOn}></Captions>
-      <BackgroundMusic items={items} enabled={musicOn && !muted} volume={musicVol}
+      <BackgroundMusic items={items} enabled={musicOn && !muted} volume={musicVol * volume}
         style={musicStyle} trackUrl={VIBE_TRACK_URL} duckEnabled={voiceoverOn}></BackgroundMusic>
       {admin && voiceoverOn && ((engine === 'elevenlabs' && !elKey && elCached === 0) || (engine === 'mp3 file' && !narrFile)) && (
         <div style={{ position: 'absolute', top: 24, left: '50%', transform: 'translateX(-50%)',
@@ -152,13 +170,13 @@ function VibeMovie({ items, captionsOn, voiceoverOn, voice, speed, engine, elVoi
       )}
       {engine === 'mp3 file' ? (
         <FileVoiceOver enabled={voiceoverOn} rate={speed} offset={narrOffset}
-          muted={muted}></FileVoiceOver>
+          muted={muted} volume={volume}></FileVoiceOver>
       ) : engine === 'elevenlabs' ? (
         <ElevenLabsVoiceOver items={items} enabled={voiceoverOn} apiKey={elKey}
-          voiceLabel={elVoice} rate={speed} muted={muted}></ElevenLabsVoiceOver>
+          voiceLabel={elVoice} rate={speed} muted={muted} volume={volume}></ElevenLabsVoiceOver>
       ) : (
         <VoiceOver items={items} enabled={voiceoverOn} rate={speed} voiceName={voice}
-          muted={muted}></VoiceOver>
+          muted={muted} volume={volume}></VoiceOver>
       )}
     </div>
   );
@@ -270,6 +288,17 @@ function VibeApp() {
   });
   const admin = access === 'admin';
   const [muted, setMuted] = React.useState(false);
+  // Master volume 0–100 (narration + music), persisted per browser.
+  const [volume, setVolume] = React.useState(() => {
+    try {
+      const v = parseFloat(localStorage.getItem('vibe-volume'));
+      if (isFinite(v)) return Math.max(0, Math.min(100, v));
+    } catch {}
+    return 100;
+  });
+  React.useEffect(() => {
+    try { localStorage.setItem('vibe-volume', String(volume)); } catch {}
+  }, [volume]);
   const [elKey, setElKey] = useElApiKey();
   const [recMode, setRecMode] = React.useState(false);
   const voices = useVoices();
@@ -412,12 +441,13 @@ function VibeApp() {
         <Stage width={1920} height={1080} duration={VIBE_DURATION} background="var(--paper)"
           speed={t.speed} autoplay={false} persistKey="vibe-explainer"
           chapters={VIBE_CHAPTERS} bar={!recMode} loop={false}
-          simple={!admin} muted={muted} onMute={setMuted}>
+          simple={!admin} muted={muted} onMute={setMuted}
+          volume={volume} onVolume={setVolume}>
           <VibeMovie items={items} captionsOn={t.captions} voiceoverOn={t.voiceover}
             voice={t.voice} speed={t.speed} engine={t.engine} elVoice={t.elVoice}
             elKey={elKey} musicOn={t.music} musicStyle={t.musicStyle}
             musicVol={t.musicVol} narrOffset={t.narrOffset || 0}
-            muted={muted} admin={admin}></VibeMovie>
+            muted={muted} volume={volume / 100} admin={admin}></VibeMovie>
           <TimelineBridge onCtx={onTlCtx}></TimelineBridge>
         </Stage>
         {admin && (

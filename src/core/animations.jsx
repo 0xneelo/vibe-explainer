@@ -344,6 +344,8 @@ function Stage({
   simple = false,  // true: viewer mode — play/pause + mute only, no seeking/skipping
   muted = false,   // audio mute state (shown on the bar when onMute is provided)
   onMute = null,   // (bool) => void — toggles the mute state
+  volume = 100,    // master volume 0–100 (slider shown when onVolume is provided)
+  onVolume = null, // (0–100) => void — sets the master volume
   children,
 }) {
   const [time, setTime] = React.useState(() => {
@@ -536,6 +538,8 @@ function Stage({
         simple={simple}
         muted={muted}
         onMute={onMute}
+        volume={volume}
+        onVolume={onVolume}
         onChapter={seekChapter}
         onPlayPause={togglePlay}
         onReset={() => { setTime(0); }}
@@ -551,7 +555,7 @@ function Stage({
 // Play/pause, return-to-begin, scrub track, time display.
 // Uses fixed-width time fields so layout doesn't thrash.
 
-function PlaybackBar({ time, hoverTime, duration, playing, chapters, simple = false, muted = false, onMute = null, onChapter, onPlayPause, onReset, onSeek, onHover }) {
+function PlaybackBar({ time, hoverTime, duration, playing, chapters, simple = false, muted = false, onMute = null, volume = 100, onVolume = null, onChapter, onPlayPause, onReset, onSeek, onHover }) {
   const trackRef = React.useRef(null);
   const [dragging, setDragging] = React.useState(false);
 
@@ -681,8 +685,22 @@ function PlaybackBar({ time, hoverTime, duration, playing, chapters, simple = fa
           )}
         </IconButton>
       )}
+      {onVolume && (
+        <div title={`Volume: ${Math.round(volume)}%`}
+          style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <input type="range" min={0} max={100} step={1}
+            value={Math.round(volume)}
+            onChange={(e) => onVolume(clamp(Number(e.target.value), 0, 100))}
+            style={{ width: 72, accentColor: 'oklch(72% 0.12 250)', cursor: 'pointer' }}/>
+          <div style={{
+            fontFamily: mono, fontSize: 11, fontVariantNumeric: 'tabular-nums',
+            width: 26, textAlign: 'right', color: 'rgba(246,244,239,0.6)',
+          }}>{Math.round(volume)}</div>
+        </div>
+      )}
 
-      {/* Current time: fixed width so it doesn't thrash */}
+      {/* Current time: fixed width so it doesn't thrash (hidden in viewer mode) */}
+      {!simple && (
       <div style={{
         fontFamily: mono,
         fontSize: 12,
@@ -692,6 +710,7 @@ function PlaybackBar({ time, hoverTime, duration, playing, chapters, simple = fa
       }}>
         {fmt(time)}
       </div>
+      )}
 
       {/* Simple mode: progress display only — no clicking, hovering or scrubbing */}
       {simple ? (
@@ -794,7 +813,8 @@ function PlaybackBar({ time, hoverTime, duration, playing, chapters, simple = fa
       </div>
       )}
 
-      {/* Duration: fixed width */}
+      {/* Duration: fixed width (hidden in viewer mode) */}
+      {!simple && (
       <div style={{
         fontFamily: mono,
         fontSize: 12,
@@ -804,6 +824,7 @@ function PlaybackBar({ time, hoverTime, duration, playing, chapters, simple = fa
       }}>
         {fmt(duration)}
       </div>
+      )}
     </div>
   );
 }

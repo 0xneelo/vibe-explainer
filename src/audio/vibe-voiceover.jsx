@@ -29,13 +29,15 @@ function pickVoice(voices, name) {
   return voices.find((v) => v.lang && v.lang.startsWith('en')) || voices[0];
 }
 
-function VoiceOver({ items, enabled, rate = 1, voiceName = 'auto', muted = false }) {
+function VoiceOver({ items, enabled, rate = 1, voiceName = 'auto', muted = false, volume = 1 }) {
   const { time, playing } = useTimeline();
   const voices = useVoices();
-  // speechSynthesis can't change volume mid-utterance — mute applies from the
-  // next spoken line onward.
+  // speechSynthesis can't change volume mid-utterance — mute/volume apply from
+  // the next spoken line onward.
   const mutedRef = React.useRef(muted);
   mutedRef.current = muted;
+  const volRef = React.useRef(volume);
+  volRef.current = volume;
   const prevTimeRef = React.useRef(time);
   const spokenRef = React.useRef(-1);
   // While a line is being spoken, the stage clock is not allowed past `at`
@@ -93,7 +95,7 @@ function VoiceOver({ items, enabled, rate = 1, voiceName = 'auto', muted = false
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(items[idx].text);
       u.rate = clamp(rateRef.current, 0.5, 2);
-      u.volume = mutedRef.current ? 0 : 1;
+      u.volume = mutedRef.current ? 0 : clamp(volRef.current, 0, 1);
       u.pitch = 1;
       if (voiceRef.current) u.voice = voiceRef.current;
       // Hold the clock just before the caption fade-out (fade is the last
