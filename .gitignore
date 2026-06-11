@@ -1,0 +1,11 @@
+# Build output (staged by scripts/build.py, deployed by CI)
+_site/
+
+# Generated standalone HTML builds (~11 MB each)
+dist/
+
+# Local working files (frame snapshots, uploads/pasted refs) — keep out of the public repo
+archive/
+
+# Editor/host artifacts
+.thumbnail

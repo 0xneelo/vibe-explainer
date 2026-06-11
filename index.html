@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Vibe — The Missing Financial Primitive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"></link>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Patrick+Hand&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet"></link>
+<meta name="ext-resource-dependency" content="assets/fonts/just-another-hand.woff2" data-resource-id="jahFont"></meta>
+<meta name="ext-resource-dependency" content="assets/images/vibe-duck.svg" data-resource-id="vibeDuck"></meta>
+<meta name="ext-resource-dependency" content="assets/audio/Optimized_Ledger_Beats_2026-06-11T150814.mp3" data-resource-id="vibeTrack"></meta>
+<style>
+  @font-face {
+    font-family: 'Just Another Hand';
+    src: url('assets/fonts/just-another-hand.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+  }
+  html, body { margin: 0; padding: 0; height: 100%; background: #0a0a0a; }
+  #root { position: absolute; inset: 0; }
+</style>
+<template id="__bundler_thumbnail" data-bg-color="#f3f3f6">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#f3f3f6"></rect>
+    <circle cx="600" cy="370" r="130" fill="#2B5CE6"></circle>
+    <path d="M 560 310 L 560 430 L 670 370 Z" fill="#ffffff"></path>
+    <rect x="480" y="560" width="240" height="16" rx="8" fill="#2B5CE6"></rect>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="src/core/animations.jsx"></script>
+<script type="text/babel" src="src/core/tweaks-panel.jsx"></script>
+<script type="text/babel" src="src/core/vibe-elements.jsx"></script>
+<script type="text/babel" src="src/scenes/vibe-scene-intro.jsx"></script>
+<script type="text/babel" src="src/scenes/vibe-scenes-a.jsx"></script>
+<script type="text/babel" src="src/scenes/vibe-scenes-b.jsx"></script>
+<script type="text/babel" src="src/scenes/vibe-scenes-c.jsx"></script>
+<script type="text/babel" src="src/audio/vibe-music.jsx"></script>
+<script type="text/babel" src="src/audio/vibe-voiceover.jsx"></script>
+<script type="text/babel" src="src/audio/vibe-elevenlabs.jsx"></script>
+<script type="text/babel" src="src/export/vibe-clips-zip.jsx"></script>
+<script type="text/babel" src="src/core/vibe-preload.jsx"></script>
+<script type="text/babel" src="src/audio/vibe-narration-file.jsx"></script>
+<script type="text/babel" src="src/export/vibe-export-audio.jsx"></script>
+<script type="text/babel" src="src/core/vibe-transcript.jsx"></script>
+<script type="text/babel" src="src/export/vibe-record.jsx"></script>
+<script type="text/babel" src="src/apps/vibe-app.jsx"></script>
+</body>
+</html>

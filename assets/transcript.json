@@ -1,0 +1,217 @@
+{
+  "format": "vibe-transcript",
+  "version": 1,
+  "savedAt": "2026-06-11T19:59:48.208Z",
+  "lines": [
+    {
+      "t": 0.6,
+      "t2": 5,
+      "text": "In such a saturated perpetual onchain exchange market, how will Vibe attract new users?"
+    },
+    {
+      "t": 5.7,
+      "t2": 7.7,
+      "text": "Very simple. Vibe might look like a perpetual exchange,  but it's actually a permissionless credit engine."
+    },
+    {
+      "t": 8.5,
+      "t2": 12.6,
+      "text": "When people think about markets, they think of two things: buying and selling."
+    },
+    {
+      "t": 14.2,
+      "t2": 17.9,
+      "text": "You buy. Maybe it goes up. You sell it to someone else. Simple, right?"
+    },
+    {
+      "t": 19.5,
+      "t2": 23.5,
+      "text": "Buying and selling are the most visible part of every economy, but they’re not the whole market."
+    },
+    {
+      "t": 25.2,
+      "t2": 29.7,
+      "text": "The real economy doesn’t run on flipping assets. It runs on credit.\nSimply said, lending and borrowing."
+    },
+    {
+      "t": 31.7,
+      "t2": 36.7,
+      "text": "So remember kids,  finance is not just buying and selling."
+    },
+    {
+      "t": 39.7,
+      "t2": 44,
+      "text": "Since Uniswap launched, the crypto industry perfected creation of assets and buying and selling of those assets."
+    },
+    {
+      "t": 45.8,
+      "t2": 50.4,
+      "text": "A token launches, a pool gets deployed, the price goes up and down. That’s the spot market."
+    },
+    {
+      "t": 52.5,
+      "t2": 57.3,
+      "text": "But once you own a lot of an asset… what can you actually do with it?"
+    },
+    {
+      "t": 59.3,
+      "t2": 63.1,
+      "text": "Buy and hold it. Hope it goes up. \nTweet about it and sell it later. That’s a very one-directional market."
+    },
+    {
+      "t": 64.7,
+      "t2": 68.3,
+      "text": "All crypto enables us is to Buy. Hold. Hope."
+    },
+    {
+      "t": 70.9,
+      "t2": 74.8,
+      "text": "Now  think about the normal economy for a second."
+    },
+    {
+      "t": 76.4,
+      "t2": 81.2,
+      "text": "One side holds assets: banks, bondholders, landlords, funds."
+    },
+    {
+      "t": 83.2,
+      "t2": 87,
+      "text": "The other side wants access: capital, leverage, exposure."
+    },
+    {
+      "t": 88.7,
+      "t2": 92.5,
+      "text": "At its core, finance is a matching engine between those two groups."
+    },
+    {
+      "t": 94,
+      "t2": 99.1,
+      "text": "One side wants yield. The other wants exposure."
+    },
+    {
+      "t": 102.1,
+      "t2": 106.2,
+      "text": "The easiest example of this is the real estate market. One person owns the place, another needs housing."
+    },
+    {
+      "t": 107.9,
+      "t2": 112.5,
+      "text": "The owner doesn’t have to sell. The renter doesn’t have to buy."
+    },
+    {
+      "t": 114.4,
+      "t2": 119.2,
+      "text": "The owner earns yield. The renter gets access or \"Exposure\". The asset is productive."
+    },
+    {
+      "t": 121.2,
+      "t2": 126.2,
+      "text": "Now imagine the Goverment would ban renting overnight. Tomorrow morning all real estate owners would rush to quickly sell all their Properties."
+    },
+    {
+      "t": 128.2,
+      "t2": 133,
+      "text": "An asset that earns nothing just sits there, so why are we holding all these unproductive crypto tokens?"
+    },
+    {
+      "t": 135.9,
+      "t2": 140,
+      "text": "And it gets worse, every year, millions of more unproductive tokens are created."
+    },
+    {
+      "t": 141.7,
+      "t2": 146.3,
+      "text": "Most share the same problem: no yield, no cash flow."
+    },
+    {
+      "t": 148.2,
+      "t2": 153.4,
+      "text": "So holding becomes hoping someone else buys it later, at a higher price.\n\nThat's why the rest of the world beliefs crypto is just a big scam. "
+    },
+    {
+      "t": 156,
+      "t2": 159.5,
+      "text": "Repeat it after me: 99% of tokens are non-productive."
+    },
+    {
+      "t": 161.9,
+      "t2": 166.6,
+      "text": "But wait! Some tokens do offer “staking rewards\".  But often it’s just printing more tokens."
+    },
+    {
+      "t": 168.5,
+      "t2": 173.1,
+      "text": "If supply inflates, your ownership gets diluted. That’s not yield."
+    },
+    {
+      "t": 175,
+      "t2": 180.6,
+      "text": "Yield means someone on the other side pays for access, leverage, or exposure."
+    },
+    {
+      "t": 185.6,
+      "t2": 190.2,
+      "text": "Real yield comes from real demand."
+    },
+    {
+      "t": 193.1,
+      "t2": 196.6,
+      "text": "This is exactly where Vibe comes in."
+    },
+    {
+      "t": 198.1,
+      "t2": 203.5,
+      "text": "Vibe is a marketplace between people who hold an asset and people who want exposure to it."
+    },
+    {
+      "t": 205.7,
+      "t2": 211.5,
+      "text": "Long, short, leveraged. Vibe adds the missing lending-and-borrowing layer on top of any token."
+    },
+    {
+      "t": 215.5,
+      "t2": 221.1,
+      "text": "For the first time in web3 we solved the simple most basic financial need.\nYield for holders. Exposure for traders."
+    },
+    {
+      "t": 224.3,
+      "t2": 229,
+      "text": "Ok there is one catch: with low-cap tokens, you can’t just hand them to a stranger and hope he returns."
+    },
+    {
+      "t": 230.9,
+      "t2": 235.3,
+      "text": "So Vibe doesn’t copy the old lending model. It makes it synthetic."
+    },
+    {
+      "t": 237.1,
+      "t2": 242.9,
+      "text": "Holders deposit into a vault. Traders trade the price, long or short, with leverage, never transferring the tokens to traders.\n\nAll managed by Vibes Protocol Operated Solver "
+    },
+    {
+      "t": 245.2,
+      "t2": 250,
+      "text": "Trader fees flow to the vault. The vault pays holders yield. That’s the whole transaction.\n\n... and the best thing, holders do not need to deposit any stablecoins."
+    },
+    {
+      "t": 251.8,
+      "t2": 255.5,
+      "text": "Vibe enables, Long. Short. Leverage. Yield.\n\nOn any asset."
+    },
+    {
+      "t": 258.1,
+      "t2": 263,
+      "text": "I hope after watching this video everyone understands. Buying and selling are only one side of finance. The other side: lending, borrowing, yield, exposure."
+    },
+    {
+      "t": 264.9,
+      "t2": 269.7,
+      "text": "That’s what turns an immature market into a mature one."
+    },
+    {
+      "t": 271.7,
+      "t2": 276.7,
+      "text": "Vibe brings that missing primitive on-chain,  so every asset can become productive."
+    }
+  ]
+}
