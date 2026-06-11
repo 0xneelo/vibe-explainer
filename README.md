@@ -38,6 +38,10 @@ Generate narration → **Download .json** + **Download clips ZIP** → save them
 | `short.html` | 60-second cut |
 | `intro.html` | Intro drawing scene only (surgical edit page) |
 
+`index.html?embed=1` — chrome-less iframe embed: autoplays from 0 (muted with a
+tap-for-sound overlay if the browser blocks audio), hides all controls, and
+posts `{ type: 'vibe-explainer-ended' }` to the parent window on completion.
+
 ## Structure
 
 ```

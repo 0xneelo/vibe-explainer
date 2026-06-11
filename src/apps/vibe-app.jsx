@@ -206,6 +206,32 @@ function CornerControls({ transcriptOn, onTranscript, hidden, children }) {
   );
 }
 
+// ── Embed mode ───────────────────────────────────────────────────────────────
+// ?embed=1 turns the page into a chrome-less autoplaying video for iframes
+// (interactive pitch decks etc.): no playback bar, no scrollbars, always
+// starts at 0, and posts { type: 'vibe-explainer-ended' } to the parent
+// window exactly once when playback fully completes.
+const VIBE_EMBED = (() => {
+  try { return new URLSearchParams(window.location.search).get('embed') === '1'; }
+  catch { return false; }
+})();
+
+// Can this frame play audible media right now? The host iframe is expected to
+// grant allow="autoplay" (→ a fresh AudioContext starts 'running'); if the
+// browser still blocks audio, we start muted and overlay a tap-for-sound
+// button instead of a play gate.
+async function vibeProbeAudioAllowed() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    const ctx = new AC();
+    try { await Promise.race([ctx.resume(), new Promise((r) => setTimeout(r, 300))]); } catch {}
+    const ok = ctx.state === 'running';
+    try { ctx.close(); } catch {}
+    return ok;
+  } catch { return false; }
+}
+
 // ── Admin access ─────────────────────────────────────────────────────────────
 // Viewers get play/stop + mute only. Opening the page with ?admin (or ?=admin)
 // asks for the password below; success unlocks the full toolset (record,
@@ -287,7 +313,26 @@ function VibeApp() {
     return 'login';
   });
   const admin = access === 'admin';
-  const [muted, setMuted] = React.useState(false);
+  // Embed: start muted until the audio probe decides — if audible playback is
+  // allowed we unmute right away (before the first narration cue at ~0.6s);
+  // if blocked we keep playing muted and show the tap-for-sound overlay.
+  const [muted, setMuted] = React.useState(VIBE_EMBED);
+  const [needsTap, setNeedsTap] = React.useState(false);
+  React.useEffect(() => {
+    if (!VIBE_EMBED) return;
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    let alive = true;
+    vibeProbeAudioAllowed().then((ok) => {
+      if (!alive) return;
+      if (ok) setMuted(false);
+      else setNeedsTap(true);
+    });
+    return () => { alive = false; };
+  }, []);
+  const embedEnded = React.useCallback(() => {
+    try { window.parent.postMessage({ type: 'vibe-explainer-ended' }, '*'); } catch {}
+  }, []);
   // Master volume 0–100 (narration + music), persisted per browser.
   const [volume, setVolume] = React.useState(() => {
     try {
@@ -439,10 +484,11 @@ function VibeApp() {
     <div style={{ position: 'absolute', inset: 0, display: 'flex', background: '#0a0a0a', ...vars }}>
       <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
         <Stage width={1920} height={1080} duration={VIBE_DURATION} background="var(--paper)"
-          speed={t.speed} autoplay={false} persistKey="vibe-explainer"
-          chapters={VIBE_CHAPTERS} bar={!recMode} loop={false}
+          speed={t.speed} autoplay={VIBE_EMBED} persistKey="vibe-explainer"
+          chapters={VIBE_CHAPTERS} bar={!recMode && !VIBE_EMBED} loop={false}
           simple={!admin} muted={muted} onMute={setMuted}
-          volume={volume} onVolume={setVolume}>
+          volume={volume} onVolume={setVolume}
+          resume={!VIBE_EMBED} onEnded={VIBE_EMBED ? embedEnded : null}>
           <VibeMovie items={items} captionsOn={t.captions} voiceoverOn={t.voiceover}
             voice={t.voice} speed={t.speed} engine={t.engine} elVoice={t.elVoice}
             elKey={elKey} musicOn={t.music} musicStyle={t.musicStyle}
@@ -450,12 +496,23 @@ function VibeApp() {
             muted={muted} volume={volume / 100} admin={admin}></VibeMovie>
           <TimelineBridge onCtx={onTlCtx}></TimelineBridge>
         </Stage>
-        {admin && (
+        {admin && !VIBE_EMBED && (
           <CornerControls transcriptOn={t.transcript} hidden={recMode}
             onTranscript={(v) => setTweak('transcript', v)}>
             <VideoExport tlRef={tlRef} recording={recMode} setRecording={setRecMode}
               engine={t.engine}></VideoExport>
           </CornerControls>
+        )}
+        {VIBE_EMBED && needsTap && (
+          <button onClick={() => { setMuted(false); setNeedsTap(false); }}
+            style={{ position: 'absolute', left: '50%', bottom: '9%',
+              transform: 'translateX(-50%)', zIndex: 90,
+              padding: '14px 30px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.25)',
+              cursor: 'pointer', background: 'rgba(20,21,30,0.88)', color: '#fff',
+              font: "700 18px 'Nunito', system-ui, sans-serif", letterSpacing: '0.01em',
+              boxShadow: '0 8px 28px rgba(0,0,0,0.4)', backdropFilter: 'blur(6px)' }}>
+            🔊 Tap for sound
+          </button>
         )}
       </div>
       {access === 'login' && (

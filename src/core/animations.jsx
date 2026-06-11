@@ -346,9 +346,12 @@ function Stage({
   onMute = null,   // (bool) => void — toggles the mute state
   volume = 100,    // master volume 0–100 (slider shown when onVolume is provided)
   onVolume = null, // (0–100) => void — sets the master volume
+  resume = true,   // false: always start at 0 and don't persist the playhead (embeds)
+  onEnded = null,  // called once when playback reaches the end of the timeline (loop=false)
   children,
 }) {
   const [time, setTime] = React.useState(() => {
+    if (!resume) return 0;
     try {
       const v = parseFloat(localStorage.getItem(persistKey + ':t') || '0');
       return isFinite(v) ? clamp(v, 0, duration) : 0;
@@ -367,8 +370,25 @@ function Stage({
 
   // Persist playhead
   React.useEffect(() => {
+    if (!resume) return;
     try { localStorage.setItem(persistKey + ':t', String(time)); } catch {}
-  }, [time, persistKey]);
+  }, [time, persistKey, resume]);
+
+  // Completion signal: fire onEnded exactly once when the playhead reaches the
+  // end of the timeline (with loop=false the clock stops there — the only way
+  // to arrive is playing through). Re-arms when the playhead leaves the end,
+  // so a replay can complete and fire again.
+  const endedFiredRef = React.useRef(false);
+  React.useEffect(() => {
+    if (time >= duration - 0.01) {
+      if (!playing && !endedFiredRef.current) {
+        endedFiredRef.current = true;
+        if (onEnded) { try { onEnded(); } catch {} }
+      }
+    } else {
+      endedFiredRef.current = false;
+    }
+  }, [time, playing, duration, onEnded]);
 
   // Auto-scale to fit viewport
   React.useEffect(() => {
