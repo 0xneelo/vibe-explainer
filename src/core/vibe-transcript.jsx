@@ -132,8 +132,8 @@ function TranscriptPanel({ items, activeIdx, onEdit, onSeek, onReset, onSave, on
         <div style={{ fontSize: 11, lineHeight: 1.4, color: 'rgba(246,244,239,0.45)',
           textAlign: 'center' }}>
           {importMsg ? importMsg
-            : dirty ? 'edits live in this browser — download a .json backup to be safe'
-            : 'tip: download a .json backup of your script anytime'}
+            : dirty ? 'unsaved edits — Save keeps them in this browser'
+            : 'to publish: Download .json → save as assets/transcript.json → push'}
         </div>
       </div>
     </div>

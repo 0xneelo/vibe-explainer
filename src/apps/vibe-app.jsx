@@ -183,6 +183,7 @@ function VibeMovie({ items, captionsOn, voiceoverOn, voice, speed, engine, elVoi
 }
 
 const VIBE_TRANSCRIPT_KEY = 'vibe-transcript-edits-v3'; // v3: line count changed (intro narration added)
+const VIBE_TRANSCRIPT_SAVED_KEY = 'vibe-transcript-saved-v3'; // baseline of the last explicit "Save transcript"
 
 // Small always-available corner controls: open the transcript panel and the
 // Tweaks console without needing the host toolbar toggle.
@@ -367,16 +368,33 @@ function VibeApp() {
       return next;
     });
   };
+  // Baseline of the last explicit "Save transcript", persisted per browser.
+  // On the deployed site there is no host that can write project files, so
+  // the button's real job is recording this baseline (the dirty flag compares
+  // against it). Publishing to visitors = replacing assets/transcript.json.
+  const [savedBaseline, setSavedBaseline] = React.useState(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem(VIBE_TRANSCRIPT_SAVED_KEY) || 'null');
+      return Array.isArray(v) ? v : null;
+    } catch { return null; }
+  });
   const resetTranscript = () => {
-    try { localStorage.removeItem(VIBE_TRANSCRIPT_KEY); } catch {}
+    try {
+      localStorage.removeItem(VIBE_TRANSCRIPT_KEY);
+      localStorage.removeItem(VIBE_TRANSCRIPT_SAVED_KEY);
+    } catch {}
+    setSavedBaseline(null);
     setTweak('script', null);
     setItems(pubTexts ? applyTexts(pubTexts) : VIBE_CAPTIONS_REAL);
   };
-  // Commit the current text into the project file. NOTE: this write can fail
-  // silently if the host isn't listening — so we deliberately KEEP the
-  // localStorage draft as a belt-and-braces copy. Never delete work.
+  // Record the saved baseline; also commit into the project file when running
+  // inside the local editor host (that write silently no-ops elsewhere). We
+  // deliberately KEEP the localStorage draft as a belt-and-braces copy.
   const saveTranscript = () => {
-    setTweak('script', items.map((c) => c.text));
+    const texts = items.map((c) => c.text);
+    setTweak('script', texts);
+    setSavedBaseline(texts);
+    try { localStorage.setItem(VIBE_TRANSCRIPT_SAVED_KEY, JSON.stringify(texts)); } catch {}
   };
   // Download the transcript as a real JSON file — a backup nothing can touch.
   const exportTranscript = () => {
@@ -434,10 +452,12 @@ function VibeApp() {
     return () => { alive = false; };
   }, []);
   const savedTexts = Array.isArray(t.script) ? t.script : null;
-  // "Dirty" = differs from what a fresh visitor would load:
-  // published transcript → project-saved script → original captions.
+  // "Dirty" = differs from the last explicit save (or, before any save, from
+  // what a fresh visitor would load): saved baseline → published transcript →
+  // project-saved script → original captions.
   const transcriptDirty = items.some((c, i) => c.text !== (
-    pubTexts && typeof pubTexts[i] === 'string' ? pubTexts[i]
+    savedBaseline && typeof savedBaseline[i] === 'string' ? savedBaseline[i]
+      : pubTexts && typeof pubTexts[i] === 'string' ? pubTexts[i]
       : savedTexts && typeof savedTexts[i] === 'string' ? savedTexts[i]
       : VIBE_CAPTIONS_REAL[i].text
   ));
