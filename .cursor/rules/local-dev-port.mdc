@@ -1,0 +1,11 @@
+---
+description: Use the project-approved local dev server port
+alwaysApply: true
+---
+
+# Local Dev Server Port
+
+- Never use `localhost:8000` for this repo.
+- Use `localhost:2500` for the local static server unless that port is already in use.
+- Preferred command: `python3 -m http.server 2500`.
+- Before starting a server, check whether a server is already running and avoid killing unrelated `http.server` processes.
