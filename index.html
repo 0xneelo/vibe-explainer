@@ -66,17 +66,91 @@
   const video = document.querySelector('video');
   const posterGate = document.querySelector('.poster-gate');
   const params = new URLSearchParams(window.location.search);
-  const volume = Number.parseFloat(params.get('volume'));
   const embedded = params.get('embed') === '1';
-  if (Number.isFinite(volume)) {
-    video.volume = Math.max(0, Math.min(1, volume / 100));
-    if (video.volume > 0) video.muted = false;
+
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n));
   }
+
+  function normalizeVolume(value) {
+    const n = Number.parseFloat(value);
+    if (!Number.isFinite(n)) return null;
+    return clamp(n > 1 ? n / 100 : n, 0, 1);
+  }
+
+  function setVideoVolume(value, unmute = true) {
+    const v = normalizeVolume(value);
+    if (v == null) return;
+    video.volume = v;
+    if (unmute && v > 0) video.muted = false;
+    try { localStorage.setItem('vibe-volume', String(Math.round(v * 100))); } catch {}
+  }
+
+  function setVideoMuted(value) {
+    video.muted = !!value;
+  }
+
+  const requestedVolume = normalizeVolume(params.get('volume'));
+  if (requestedVolume != null) {
+    setVideoVolume(requestedVolume, requestedVolume > 0);
+  } else {
+    try {
+      const saved = normalizeVolume(localStorage.getItem('vibe-volume'));
+      if (saved != null) setVideoVolume(saved, false);
+    } catch {}
+  }
+  if (params.has('muted')) {
+    const muted = params.get('muted');
+    setVideoMuted(muted !== '0' && muted !== 'false');
+  }
+
   if (embedded) {
     video.addEventListener('ended', () => {
       try { window.parent.postMessage({ type: 'vibe-explainer-ended' }, '*'); } catch {}
     }, { once: true });
   }
+
+  // Compatibility bridge for parent pages that used to control the live player.
+  // Accepts both explicit Vibe messages and generic media-control shapes:
+  //   { type: 'vibe-explainer-volume', volume: 20 }
+  //   { type: 'vibe-explainer-muted', muted: true }
+  //   { type: 'vibe-explainer-play' | 'vibe-explainer-pause' }
+  //   { type: 'vibe-explainer-seek', time: 12.3 }
+  window.addEventListener('message', (event) => {
+    const data = event.data || {};
+    const type = String(data.type || data.action || '').toLowerCase();
+    if (type.includes('volume') || data.volume != null) {
+      setVideoVolume(data.volume != null ? data.volume : data.value);
+      return;
+    }
+    if (type.includes('mute') || data.muted != null) {
+      setVideoMuted(data.muted != null ? data.muted : !type.includes('unmute'));
+      return;
+    }
+    if (type.includes('play')) {
+      video.play().catch(() => {});
+      return;
+    }
+    if (type.includes('pause')) {
+      video.pause();
+      return;
+    }
+    if (type.includes('seek') || data.time != null) {
+      const t = Number.parseFloat(data.time != null ? data.time : data.value);
+      if (Number.isFinite(t)) video.currentTime = clamp(t, 0, video.duration || t);
+    }
+  });
+
+  window.__vibeVideo = {
+    el: video,
+    setVolume: setVideoVolume,
+    setMuted: setVideoMuted,
+    play: () => video.play(),
+    pause: () => video.pause(),
+  };
+
+  try { window.parent.postMessage({ type: 'vibe-explainer-ready' }, '*'); } catch {}
+
   setTimeout(() => {
     posterGate.classList.add('is-hidden');
     video.style.pointerEvents = 'auto';
