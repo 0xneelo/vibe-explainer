@@ -18,6 +18,7 @@ exactly what visitors get auto-loaded.
 """
 
 import json
+import re
 import shutil
 import sys
 import zipfile
@@ -28,6 +29,8 @@ SITE = ROOT / "_site"
 
 TRANSCRIPT = ROOT / "assets" / "transcript.json"
 CLIPS_ZIP = ROOT / "assets" / "narration-clips.zip"
+SLIDE_TEXT = ROOT / "assets" / "slide-text.json"
+SLIDE_TEXT_SRC = ROOT / "src" / "core" / "vibe-slide-text.jsx"
 
 ENTRY_PAGES = ["index.html", "short.html", "intro.html"]
 SITE_DIRS = ["src", "assets"]
@@ -90,6 +93,50 @@ def validate_narration_assets():
     print(f"  transcript ↔ clips       OK — all {len(texts)} line texts match")
 
 
+def validate_slide_text():
+    """assets/slide-text.json is the published baseline for the on-screen slide
+    text (src/core/vibe-slide-text.jsx fetches it on page load). Broken JSON
+    fails the build; key drift vs. the code's default registry only warns —
+    unknown keys are ignored at runtime and missing keys fall back to defaults.
+    """
+    if not SLIDE_TEXT.exists():
+        fail(f"{SLIDE_TEXT.relative_to(ROOT)} is missing "
+             f"(regenerate with scripts/gen-slide-text.py)")
+    try:
+        data = json.loads(SLIDE_TEXT.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        fail(f"{SLIDE_TEXT.relative_to(ROOT)} is not valid JSON: {e}")
+    if data.get("format") != "vibe-slide-text":
+        fail(f"{SLIDE_TEXT.relative_to(ROOT)} has format={data.get('format')!r}, "
+             f"expected 'vibe-slide-text'")
+    texts = data.get("texts")
+    if not isinstance(texts, dict) or not texts:
+        fail(f"{SLIDE_TEXT.relative_to(ROOT)} has no 'texts' object")
+    bad = [k for k, v in texts.items() if not isinstance(v, str)]
+    if bad:
+        fail(f"{SLIDE_TEXT.relative_to(ROOT)} has non-string texts: {bad[:5]}")
+
+    # Cross-check against the default registry in the source file.
+    m = re.search(r"/\*ST-DEFAULTS-BEGIN\*/(.*?)/\*ST-DEFAULTS-END\*/",
+                  SLIDE_TEXT_SRC.read_text(encoding="utf-8"), re.S)
+    if not m:
+        fail(f"ST-DEFAULTS markers not found in {SLIDE_TEXT_SRC.relative_to(ROOT)}")
+    try:
+        defaults = json.loads(m.group(1))
+    except json.JSONDecodeError as e:
+        fail(f"defaults block in {SLIDE_TEXT_SRC.relative_to(ROOT)} is not valid JSON: {e}")
+    extra = sorted(set(texts) - set(defaults))
+    missing = sorted(set(defaults) - set(texts))
+    if extra:
+        print(f"  WARNING: slide-text.json has {len(extra)} key(s) not in the "
+              f"registry (ignored at runtime): {', '.join(extra[:5])}")
+    if missing:
+        print(f"  WARNING: slide-text.json is missing {len(missing)} registry "
+              f"key(s) (defaults apply): {', '.join(missing[:5])}")
+    print(f"  slide-text.json          OK — {len(texts)} texts "
+          f"({len(defaults)} registry keys)")
+
+
 def stage_site():
     if SITE.exists():
         shutil.rmtree(SITE)
@@ -111,6 +158,8 @@ def stage_site():
 def main():
     print("Validating auto-loaded narration assets…")
     validate_narration_assets()
+    print("Validating slide text…")
+    validate_slide_text()
     print("Staging site…")
     stage_site()
     print("Build OK.")

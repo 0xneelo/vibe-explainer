@@ -417,14 +417,21 @@ function Highlight({ start, end, children, size = 110, underlineWord = null }) {
 // ── TimeScale: runs children's timeline slower/faster than the real clock ───
 // factor 1.3 = children see time advancing 30% slower. Anything outside
 // (captions, voiceover) keeps real time.
-function TimeScale({ factor = 1, children }) {
+// Optional `map`/`inv` replace the constant factor with an arbitrary
+// real→scene-local warp (and its inverse for seeking) — used by "Render" to
+// pace each scene to its narration. When omitted, the constant factor applies.
+function TimeScale({ factor = 1, map = null, inv = null, children }) {
   const ctx = useTimeline();
-  const value = React.useMemo(() => ({
-    ...ctx,
-    time: ctx.time / factor,
-    duration: (ctx.duration || 0) / factor,
-    setTime: ctx.setTime ? (s) => ctx.setTime(s * factor) : undefined,
-  }), [ctx, factor]);
+  const value = React.useMemo(() => {
+    const toScene = map || ((tt) => tt / factor);
+    const toReal = inv || ((s) => s * factor);
+    return {
+      ...ctx,
+      time: toScene(ctx.time),
+      duration: toScene(ctx.duration || 0),
+      setTime: ctx.setTime ? (s) => ctx.setTime(toReal(s)) : undefined,
+    };
+  }, [ctx, factor, map, inv]);
   return (
     <TimelineContext.Provider value={value}>
       {children}

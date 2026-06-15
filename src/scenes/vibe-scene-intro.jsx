@@ -1,7 +1,7 @@
-// vibe-scene-intro.jsx — S0 title card: "The Trojan Horse GTM".
-// 1:1 rebuild of the user's intro image with the whiteboard engine:
-// big handwritten title, blue scribble, and a sketched hand holding the
-// Vibe app phone (duck badge, chart, two buttons, hatch shadow, sparkles).
+// vibe-scene-intro.jsx — S0 title card: "The Permissionless Credit Layer".
+// big handwritten title, blue scribble, a sketched hand holding the Vibe app
+// phone (duck badge, chart, two buttons, hatch shadow, sparkles), and two
+// "built on" credit badges.
 // Also exports TimeShift, used by vibe-app.jsx to push S1–S9 later.
 
 // Runs children's clock `offset` seconds behind the parent timeline.
@@ -138,11 +138,6 @@ function SceneIntro() {
           {/* title scribble underline */}
           <DrawPath d={scribblePath(128, 278, 600, 12)} start={0.85} dur={0.5}
           stroke="var(--accent)" width={14}></DrawPath>
-          {/* underline below "attract users?" */}
-          <DrawPath d={sketchLine(420, 529, 580, 525, 18, 2)} start={1.85} dur={0.3}
-          stroke="var(--accent)" width={5.5}></DrawPath>
-          <DrawPath d={sketchLine(592, 527, 726, 523, 19, 2)} start={2.05} dur={0.3}
-          stroke="var(--accent)" width={5.5}></DrawPath>
           {/* wordmark scribble — appears last */}
           <DrawPath d={scribblePath(124, 994, 134, 23)} start={5.15} dur={0.35}
           stroke="var(--accent)" width={8}></DrawPath>
@@ -160,29 +155,34 @@ function SceneIntro() {
         lineHeight={1}>
           <span style={{ display: 'inline-block', transform: 'scaleY(1.55)',
             transformOrigin: '0 0', WebkitTextStroke: '3px var(--ink)',
-            letterSpacing: '0.01em' }}>The Trojan Horse GTM</span>
+            letterSpacing: '0.01em', fontFamily: 'Caveat', fontWeight: 800 }}>{ST('s0.title')}</span>
         </HandText>
-        {/* subtitle */}
-        <HandText x={140} y={381} size={60} font="var(--font-hand)" start={1.15}>
-          <span style={{ WebkitTextStroke: '0.8px var(--ink)' }}>In such a saturated perp dex market,</span>
+        {/* subtitle — wraps within a fixed width */}
+        <HandText x={140} y={381} size={60} width={1040} font="var(--font-hand)" start={1.15}>
+          <span style={{ WebkitTextStroke: '0.8px var(--ink)' }}>{ST('s0.sub')}</span>
         </HandText>
-        <HandText x={140} y={465} size={60} font="var(--font-hand)" start={1.5}>
-          <span style={{ WebkitTextStroke: '0.8px var(--ink)' }}>how will <span
-              style={{ color: 'var(--accent)', WebkitTextStroke: '0.8px var(--accent)' }}>Vibe</span> attract users?</span>
+        {/* accent question */}
+        <HandText x={140} y={555} size={60} font="var(--font-hand)" start={1.5}>
+          <span style={{ color: 'var(--accent)', WebkitTextStroke: '0.8px var(--accent)' }}>{ST('s0.accent')}</span>
         </HandText>
-        {/* punchline — lands at the end of the scene */}
-        <HandText x={140} y={565} size={60} font="var(--font-hand)" start={4.5}>
-          <span style={{ WebkitTextStroke: '0.8px var(--ink)' }}>Very simple....Vibe might look like a perp dex,</span>
+        {/* "Built on …" badges — sketched chip plates */}
+        <HandText x={140} y={770} size={46} font="var(--font-hand)" start={4.7} plate={true}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ width: 30, height: 30, background: 'var(--accent)', display: 'inline-block', transform: 'rotate(45deg)', borderRadius: '6px' }}></span>
+            <span style={{ WebkitTextStroke: '0.6px var(--ink)' }}>{ST('s0.badge1.pre')} <span style={{ color: 'var(--accent)', WebkitTextStroke: '0.6px var(--accent)' }}>{ST('s0.badge1.accent')}</span></span>
+          </span>
         </HandText>
-        <HandText x={140} y={641} size={60} font="var(--font-hand)" start={4.75}>
-          <span style={{ WebkitTextStroke: '0.8px var(--ink)' }}>but its actually a <span
-              style={{ color: 'var(--accent)', WebkitTextStroke: '0.8px var(--accent)' }}>permissionless credit engine.</span></span>
+        <HandText x={680} y={770} size={46} font="var(--font-hand)" start={5.0} plate={true}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ width: 30, height: 30, background: 'var(--accent)', display: 'inline-block', borderRadius: '50%' }}></span>
+            <span style={{ WebkitTextStroke: '0.6px var(--ink)' }}>{ST('s0.badge2.pre')} <span style={{ color: 'var(--accent)', WebkitTextStroke: '0.6px var(--accent)' }}>{ST('s0.badge2.accent')}</span></span>
+          </span>
         </HandText>
         {/* wordmark — last element of the scene */}
         <HandText x={122} y={928} size={60} font="var(--font-brand)" weight={900}
-        start={5.0}>Vibe</HandText>
+        start={5.0}>{ST('s0.wordmark')}</HandText>
         <HandText x={282} y={942} size={47} font="var(--font-brand)" weight={500}
-        start={5.1}>Trading</HandText>
+        start={5.1}>{ST('s0.wordmark.sub')}</HandText>
       </SceneWrap>
     </Sprite>);
 

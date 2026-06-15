@@ -14,7 +14,7 @@ function voFmtTime(t) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-function TranscriptLine({ item, idx, active, onEdit, onSeek }) {
+function TranscriptLine({ item, idx, active, cached, onEdit, onSeek }) {
   return (
     <div style={{
       display: 'flex', gap: 10, alignItems: 'flex-start',
@@ -22,6 +22,12 @@ function TranscriptLine({ item, idx, active, onEdit, onSeek }) {
       background: active ? 'rgba(95,135,255,0.13)' : 'transparent',
       border: active ? '1px solid rgba(95,135,255,0.45)' : '1px solid transparent',
     }}>
+      <span title={cached
+          ? 'Narration audio ready'
+          : 'Audio not generated for this text yet — playback will pause here until you generate it'}
+        style={{ flexShrink: 0, marginTop: 9, width: 9, height: 9, borderRadius: '50%',
+          background: cached ? '#3fb950' : '#e0a32e',
+          boxShadow: cached ? 'none' : '0 0 0 3px rgba(224,163,46,0.18)' }}></span>
       <button onClick={() => onSeek(item.t)} title="Jump to this line"
         style={{
           flexShrink: 0, marginTop: 3, padding: '2px 8px',
@@ -46,11 +52,33 @@ function TranscriptLine({ item, idx, active, onEdit, onSeek }) {
   );
 }
 
-function TranscriptPanel({ items, activeIdx, onEdit, onSeek, onReset, onSave, onExport, onImport, dirty }) {
+function TranscriptPanel({ items, activeIdx, voiceLabel, apiKey,
+  onEdit, onSeek, onReset, onSave, onExport, onImport, dirty }) {
   const fileRef = React.useRef(null);
   const [importMsg, setImportMsg] = React.useState(null);
   const listRef = React.useRef(null);
   const itemRefs = React.useRef([]);
+  // Per-line narration cache status (green = ready, amber = needs generating).
+  const voiceId = elVoiceId(voiceLabel);
+  const cachedFlags = useElLineCached(items, voiceId);
+  const missingCount = cachedFlags.filter((c) => !c).length;
+  const [gen, setGen] = React.useState(null); // "3/12" while generating, or null
+  // Generate clips for ONLY the amber (missing) lines, with live i/N progress.
+  const generateMissing = async () => {
+    let done = 0;
+    for (let i = 0; i < items.length; i++) {
+      if (cachedFlags[i]) continue;
+      setGen(`${++done}/${missingCount}`);
+      try {
+        await elEnsureClip(elClipKey(voiceId, items[i].text),
+          { apiKey, voiceId, text: items[i].text });
+      } catch (e) {
+        setGen(`⚠ ${e.message || e}`);
+        return;
+      }
+    }
+    setGen(null); // ELCache.notify() inside elEnsureClip already refreshes the dots
+  };
   // Keep the active line in view (no scrollIntoView — manual scrollTop).
   React.useEffect(() => {
     const list = listRef.current, el = itemRefs.current[activeIdx];
@@ -86,12 +114,21 @@ function TranscriptPanel({ items, activeIdx, onEdit, onSeek, onReset, onSave, on
         {items.map((item, i) => (
           <div key={i} ref={(el) => { itemRefs.current[i] = el; }}>
             <TranscriptLine item={item} idx={i} active={i === activeIdx}
-              onEdit={onEdit} onSeek={onSeek}></TranscriptLine>
+              cached={cachedFlags[i]} onEdit={onEdit} onSeek={onSeek}></TranscriptLine>
           </div>
         ))}
       </div>
       <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.09)',
         display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+        {apiKey && missingCount > 0 && (
+          <button onClick={generateMissing} disabled={gen != null}
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 7, border: 'none',
+              cursor: gen != null ? 'default' : 'pointer',
+              background: 'rgba(224,163,46,0.92)', color: '#1a1300',
+              font: "700 13px Nunito, system-ui, sans-serif" }}>
+            {gen ? `Generating ${gen}…` : `⚡ Generate missing audio (${missingCount})`}
+          </button>
+        )}
         <button onClick={onSave} disabled={!dirty}
           style={{
             width: '100%', padding: '9px 12px', borderRadius: 7,

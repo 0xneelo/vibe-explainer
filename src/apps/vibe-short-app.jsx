@@ -59,7 +59,7 @@ const SHORT_SCENE_NAMES = [
 const SHORT_DURATION = 63;
 const SHORT_CHAPTERS = SHORT_SCENE_NAMES.map((s) => ({ t: s[0], label: s[1] }));
 
-function ShortMovie({ items, captionsOn, voiceoverOn, voice, speed, engine, elVoice, elKey,
+function ShortMovie({ items, captionsOn, voiceoverOn, speed, engine, elVoice, elKey,
   musicOn, musicStyle, musicVol }) {
   const t = useTime();
   const scene = SHORT_SCENE_NAMES.filter((s) => t >= s[0]).pop();
@@ -86,12 +86,8 @@ function ShortMovie({ items, captionsOn, voiceoverOn, voice, speed, engine, elVo
           Narration muted — add your ElevenLabs key in Console → Narrator
         </div>
       )}
-      {engine === 'elevenlabs' && elKey ? (
-        <ElevenLabsVoiceOver items={items} enabled={voiceoverOn} apiKey={elKey}
-          voiceLabel={elVoice} rate={speed}></ElevenLabsVoiceOver>
-      ) : (
-        <VoiceOver items={items} enabled={voiceoverOn} rate={speed} voiceName={voice}></VoiceOver>
-      )}
+      <ElevenLabsVoiceOver items={items} enabled={voiceoverOn} apiKey={elKey}
+        voiceLabel={elVoice} rate={speed}></ElevenLabsVoiceOver>
     </div>
   );
 }
@@ -119,10 +115,6 @@ function ShortCornerControls({ transcriptOn, onTranscript }) {
 function ShortApp() {
   const [t, setTweak] = useTweaks(SHORT_TWEAK_DEFAULTS);
   const [elKey, setElKey] = useElApiKey();
-  const voices = useVoices();
-  const voiceOptions = ['auto'].concat(
-    voices.filter((v) => v.lang && v.lang.startsWith('en')).map((v) => v.name).slice(0, 10)
-  );
   const [items, setItems] = React.useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(SHORT_TRANSCRIPT_KEY) || 'null');
@@ -182,7 +174,7 @@ function ShortApp() {
           speed={t.speed} autoplay={false} persistKey="vibe-explainer-short"
           chapters={SHORT_CHAPTERS}>
           <ShortMovie items={items} captionsOn={t.captions} voiceoverOn={t.voiceover}
-            voice={t.voice} speed={t.speed} engine={t.engine} elVoice={t.elVoice}
+            speed={t.speed} engine={t.engine} elVoice={t.elVoice}
             elKey={elKey} musicOn={t.music} musicStyle={t.musicStyle}
             musicVol={t.musicVol}></ShortMovie>
           <TimelineBridge onCtx={onTlCtx}></TimelineBridge>
@@ -220,20 +212,11 @@ function ShortApp() {
         <TweakSlider label="Music volume" value={t.musicVol} min={0} max={1} step={0.05}
           onChange={(v) => setTweak('musicVol', v)}></TweakSlider>
         <TweakSection label="Narrator"></TweakSection>
-        <TweakRadio label="Engine" value={t.engine} options={['browser', 'elevenlabs']}
-          onChange={(v) => setTweak('engine', v)}></TweakRadio>
-        {t.engine === 'elevenlabs' ? (
-          <>
-            <TweakSelect label="Voice" value={t.elVoice}
-              options={EL_VOICES.map((v) => v.label)}
-              onChange={(v) => setTweak('elVoice', v)}></TweakSelect>
-            <ELNarrationControls items={items} voiceLabel={t.elVoice}
-              apiKey={elKey} setApiKey={setElKey}></ELNarrationControls>
-          </>
-        ) : (
-          <TweakSelect label="Voice" value={t.voice} options={voiceOptions}
-            onChange={(v) => setTweak('voice', v)}></TweakSelect>
-        )}
+        <TweakSelect label="Voice" value={t.elVoice}
+          options={EL_VOICES.map((v) => v.label)}
+          onChange={(v) => setTweak('elVoice', v)}></TweakSelect>
+        <ELNarrationControls items={items} voiceLabel={t.elVoice}
+          apiKey={elKey} setApiKey={setElKey}></ELNarrationControls>
         <TweakSlider label="Speed" value={t.speed} min={0.5} max={2} step={0.25} unit="×"
           onChange={(v) => setTweak('speed', v)}></TweakSlider>
       </TweaksPanel>

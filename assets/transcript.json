@@ -1,17 +1,17 @@
 {
   "format": "vibe-transcript",
   "version": 1,
-  "savedAt": "2026-06-11T19:59:48.208Z",
+  "savedAt": "2026-06-15T15:54:08.165Z",
   "lines": [
     {
       "t": 0.6,
       "t2": 5,
-      "text": "In such a saturated perpetual onchain exchange market, how will Vibe attract new users?"
+      "text": "Introducing the Permissionless Credit Layer, build on Hyperliquid."
     },
     {
       "t": 5.7,
       "t2": 7.7,
-      "text": "Very simple. Vibe might look like a perpetual exchange,  but it's actually a permissionless credit engine."
+      "text": "Orderbooks scale markets. Vibe Trading helps discover which assets deserve leverage.\n\n\nLet me explain how Credit is the missing piece to house all of finance."
     },
     {
       "t": 8.5,

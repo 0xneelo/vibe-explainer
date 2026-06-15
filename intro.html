@@ -26,10 +26,30 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel" src="src/core/animations.jsx"></script>
-<script type="text/babel" src="src/core/vibe-elements.jsx"></script>
-<script type="text/babel" src="src/scenes/vibe-scenes-a.jsx"></script>
-<script type="text/babel" src="src/scenes/vibe-scene-intro.jsx"></script>
-<script type="text/babel" src="src/apps/vibe-intro-app.jsx"></script>
+<!-- Local JSX is compiled in-browser by Babel, so a plain HTTP server (and the
+     deployed CDN) will otherwise serve a STALE cached build after an edit. Each
+     file is loaded with a version query: on localhost / LAN it auto-busts every
+     reload (edits always show up); on the deployed site it stays cached until
+     VIBE_SRC_VERSION is bumped, forcing every visitor to re-fetch. -->
+<script>
+  (function () {
+    var h = location.hostname;
+    var isDev = h === 'localhost' || h === '127.0.0.1' || h === ''
+      || /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h);
+    window.VIBE_SRC_VERSION = isDev ? String(Date.now()) : '20260615-1';
+    var srcs = [
+      'src/core/animations.jsx',
+      'src/core/vibe-elements.jsx',
+      'src/core/vibe-slide-text.jsx',
+      'src/scenes/vibe-scenes-a.jsx',
+      'src/scenes/vibe-scene-intro.jsx',
+      'src/apps/vibe-intro-app.jsx'
+    ];
+    for (var i = 0; i < srcs.length; i++) {
+      document.write('<script type="text/babel" src="' + srcs[i]
+        + '?v=' + window.VIBE_SRC_VERSION + '"><\/script>');
+    }
+  })();
+</script>
 </body>
 </html>

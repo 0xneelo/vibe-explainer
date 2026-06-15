@@ -49,8 +49,8 @@ function Scene4() {
                 </g>
               )}
             </Seg>
-            <SvgText x={420} y={1010} size={34} font="var(--font-display)" weight={700} start={3.2}>OWNER</SvgText>
-            <SvgText x={1500} y={1010} size={34} font="var(--font-display)" weight={700} start={4.0}>RENTER</SvgText>
+            <SvgText x={420} y={1010} size={34} font="var(--font-display)" weight={700} start={3.2}>{ST('s4.owner')}</SvgText>
+            <SvgText x={1500} y={1010} size={34} font="var(--font-display)" weight={700} start={4.0}>{ST('s4.renter')}</SvgText>
             {/* Rent / access arrows */}
             <Seg start={5.0} end={17.3} keepAfter={false}>
               <DrawPath d={`M 1430 640 Q 960 560 510 640`} start={0} dur={1.0} width={5} stroke="var(--accent)"></DrawPath>
@@ -60,9 +60,9 @@ function Scene4() {
             </Seg>
             <Seg start={6.2} end={17.3} keepAfter={false}>
               <SvgText x={960} y={545} size={38} font="var(--font-display)" weight={700} color="var(--accent)"
-                plate plateSeed={123}>← RENT (yield)</SvgText>
+                plate plateSeed={123}>{ST('s4.label.rent')}</SvgText>
               <SvgText x={960} y={815} size={38} font="var(--font-display)" weight={700}
-                plate plateSeed={124}>ACCESS (a home) →</SvgText>
+                plate plateSeed={124}>{ST('s4.label.access')}</SvgText>
             </Seg>
             {/* THE BAN — lands only after “…ban renting overnight” is narrated */}
             <Seg start={17.4}>
@@ -74,7 +74,7 @@ function Scene4() {
                     <path d={sketchRect(520, 455, 880, 150, 12, 55)} fill="var(--paper)" stroke="var(--bad)" strokeWidth="9"></path>
                     <text x={960} y={555} textAnchor="middle"
                       style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 76, fill: 'var(--bad)', letterSpacing: 2 }}>
-                      RENTING BANNED
+                      {ST('s4.ban')}
                     </text>
                   </g>
                 );
@@ -82,14 +82,14 @@ function Scene4() {
             </Seg>
             {/* value crash */}
             <DrawPath d={sketchArrow(1290, 330, 1420, 470, 57)} start={18.4} dur={0.3} width={7} stroke="var(--bad)"></DrawPath>
-            <SvgText x={1480} y={420} size={36} color="var(--bad)" font="var(--font-display)" weight={700} start={18.85}>value?</SvgText>
+            <SvgText x={1480} y={420} size={36} color="var(--bad)" font="var(--font-display)" weight={700} start={18.85}>{ST('s4.value')}</SvgText>
           </SceneSvg>
           <HandText x={960} y={52} size={56} align="center" font="var(--font-display)" weight={700}
-            start={0.5} rotate={-1}>The oldest yield market on earth</HandText>
+            start={0.5} rotate={-1}>{ST('s4.title')}</HandText>
           <HandText x={960} y={690} size={42} align="center" start={19.5} rotate={-2} plate
-            color="var(--ink-soft)" width={700}>no income → way less reason to own it</HandText>
+            color="var(--ink-soft)" width={700}>{ST('s4.noincome')}</HandText>
         </Cam>
-        <Highlight start={S + 20.4} end={S + 25.7} size={112}>An asset that earns nothing just *sits there.*</Highlight>
+        <Highlight start={S + 20.4} end={S + 25.7} size={112}>{ST('s4.highlight')}</Highlight>
       </SceneWrap>
     </Sprite>
   );
@@ -98,7 +98,7 @@ function Scene4() {
 // ═══════════════════════ SCENE 5 — THE TOKEN CONVEYOR ═══════════════════════
 function Scene5() {
   const S = 98;
-  const NAMES = ['DOG', 'CAT', 'AI', 'MEME', 'GAME', 'DAO', 'DOG2', 'PEPE', 'MOON', 'CHAD'];
+  const NAMES = ST('s5.tokens').split(',').map((s) => s.trim()).filter(Boolean);
   return (
     <Sprite start={S} end={S + 20}>
       <SceneWrap label="S5 conveyor">
@@ -107,9 +107,9 @@ function Scene5() {
             {/* printer */}
             <DrawPath d={sketchRect(120, 380, 320, 260, 16, 61)} start={0.2} dur={0.9} width={6}
               fill="var(--paper2)"></DrawPath>
-            <SvgText x={280} y={490} size={38} font="var(--font-display)" weight={700} start={0.9}>TOKEN</SvgText>
-            <SvgText x={280} y={540} size={38} font="var(--font-display)" weight={700} start={0.9}>PRINTER</SvgText>
-            <SvgText x={280} y={590} size={26} color="var(--ink-soft)" start={1.1}>(open 24/7)</SvgText>
+            <SvgText x={280} y={490} size={38} font="var(--font-display)" weight={700} start={0.9}>{ST('s5.printer.l1')}</SvgText>
+            <SvgText x={280} y={540} size={38} font="var(--font-display)" weight={700} start={0.9}>{ST('s5.printer.l2')}</SvgText>
+            <SvgText x={280} y={590} size={26} color="var(--ink-soft)" start={1.1}>{ST('s5.printer.sub')}</SvgText>
             {/* belt */}
             <DrawPath d={`${sketchLine(440, 620, 1240, 620, 63)} ${sketchLine(440, 668, 1240, 668, 64)}`}
               start={0.8} dur={0.8} width={5}></DrawPath>
@@ -136,7 +136,7 @@ function Scene5() {
                     }
                     const o = age > 3.6 ? clamp((4.4 - age) / 0.6, 0, 1) : 1;
                     return (
-                      <g key={name} opacity={o} transform={age > 2.6 ? `rotate(${(age - 2.6) * 70} ${x} ${y})` : ''}>
+                      <g key={i} opacity={o} transform={age > 2.6 ? `rotate(${(age - 2.6) * 70} ${x} ${y})` : ''}>
                         <circle cx={x} cy={y} r={38} fill="var(--paper2)" stroke="var(--ink)" strokeWidth="4.5"></circle>
                         <text x={x} y={y + 9} textAnchor="middle"
                           style={{ fontFamily: 'var(--font-hand)', fontSize: 25, fontWeight: 700, fill: 'var(--ink)' }}>{name}</text>
@@ -149,26 +149,26 @@ function Scene5() {
             {/* the box */}
             <DrawPath d={sketchRect(1270, 780, 380, 180, 10, 71)} start={1.4} dur={0.8} width={6}
               fill="var(--paper2)"></DrawPath>
-            <SvgText x={1460} y={880} size={44} font="var(--font-display)" weight={700} start={2.2}>NO YIELD</SvgText>
-            <SvgText x={1460} y={925} size={26} color="var(--ink-soft)" start={2.4}>99% of tokens</SvgText>
+            <SvgText x={1460} y={880} size={44} font="var(--font-display)" weight={700} start={2.2}>{ST('s5.box.title')}</SvgText>
+            <SvgText x={1460} y={925} size={26} color="var(--ink-soft)" start={2.4}>{ST('s5.box.sub')}</SvgText>
             {/* tiny productive box */}
             <DrawPath d={sketchRect(1730, 880, 130, 80, 8, 73)} start={3.0} dur={0.6} width={4.5}
               stroke="var(--accent)" fill="var(--accent-soft)"></DrawPath>
-            <SvgText x={1795} y={915} size={20} color="var(--accent)" weight={700} start={3.6}>productive</SvgText>
-            <SvgText x={1795} y={942} size={20} color="var(--accent)" weight={700} start={3.6}>assets</SvgText>
+            <SvgText x={1795} y={915} size={20} color="var(--accent)" weight={700} start={3.6}>{ST('s5.productive.l1')}</SvgText>
+            <SvgText x={1795} y={942} size={20} color="var(--accent)" weight={700} start={3.6}>{ST('s5.productive.l2')}</SvgText>
             {/* trust me bro vignette */}
             <Seg start={12.2}>
               <Seg start={0}><StickFigure x={620} y={420} pose="point" facing={1} start={0} scale={0.95}></StickFigure></Seg>
               <Seg start={0.4}><StickFigure x={880} y={420} pose="stand" facing={-1} mood="sad" start={0} scale={0.95}></StickFigure></Seg>
               <Bubble x={330} y={90} w={420} h={130} tail="br" start={0.8} fontSize={34}>
-                “Trust me bro, future utility.”
+                {ST('s5.bubble')}
               </Bubble>
             </Seg>
           </SceneSvg>
           <HandText x={960} y={52} size={56} align="center" font="var(--font-display)" weight={700}
-            start={0.4} rotate={1}>Millions of tokens / year</HandText>
+            start={0.4} rotate={1}>{ST('s5.title')}</HandText>
         </Cam>
-        <Highlight start={S + 15.8} end={S + 19.7} size={116}>99% of tokens are *non-productive.*</Highlight>
+        <Highlight start={S + 15.8} end={S + 19.7} size={116}>{ST('s5.highlight')}</Highlight>
       </SceneWrap>
     </Sprite>
   );
@@ -200,7 +200,7 @@ function Scene6() {
           <SceneSvg>
             <Ground start={0} y={960}></Ground>
             {/* Machine 1: inflation */}
-            <YieldMachine x={210} y={400} label1="INFLATION" label2="MACHINE" start={0.2} seed={81}></YieldMachine>
+            <YieldMachine x={210} y={400} label1={ST('s6.machine1.l1')} label2={ST('s6.machine1.l2')} start={0.2} seed={81}></YieldMachine>
             {/* printed tokens raining onto pile */}
             <Seg start={1.6}>
               {({ localTime }) => (
@@ -216,7 +216,7 @@ function Scene6() {
                 </g>
               )}
             </Seg>
-            <SvgText x={700} y={945} size={30} color="var(--ink-soft)" start={3.2}>more tokens…</SvgText>
+            <SvgText x={700} y={945} size={30} color="var(--ink-soft)" start={3.2}>{ST('s6.more')}</SvgText>
             {/* shrinking share */}
             <Seg start={4.6}>
               {({ localTime }) => {
@@ -225,7 +225,7 @@ function Scene6() {
                   <g>
                     <circle cx={420} cy={840} r={56 * shrink} fill="var(--bad-soft)" stroke="var(--bad)" strokeWidth="5"></circle>
                     <text x={420} y={852} textAnchor="middle" style={{ fontFamily: 'var(--font-hand)', fontSize: 30 * shrink + 6, fill: 'var(--bad)', fontWeight: 700 }}>
-                      your share
+                      {ST('s6.share')}
                     </text>
                   </g>
                 );
@@ -237,14 +237,14 @@ function Scene6() {
                 start={0} dur={0.5} width={13} stroke="var(--bad)"></DrawPath>
             </Seg>
             {/* Machine 2: real demand */}
-            <YieldMachine x={1250} y={400} label1="REAL DEMAND" label2="MACHINE" accent start={10.4} seed={83}></YieldMachine>
+            <YieldMachine x={1250} y={400} label1={ST('s6.machine2.l1')} label2={ST('s6.machine2.l2')} accent start={10.4} seed={83}></YieldMachine>
             <Seg start={11.4}>
               <Seg start={0}><StickFigure x={1130} y={960} pose="press" facing={1} start={0}></StickFigure></Seg>
-              <SvgText x={1130} y={700} size={30} font="var(--font-display)" weight={700} start={0.5}>TRADER</SvgText>
+              <SvgText x={1130} y={700} size={30} font="var(--font-display)" weight={700} start={0.5}>{ST('s6.trader')}</SvgText>
               <Seg start={0.5}><StickFigure x={1830} y={960} pose="cheer" facing={-1} mood="happy" start={0}></StickFigure></Seg>
-              <SvgText x={1830} y={700} size={30} font="var(--font-display)" weight={700} start={1.0}>HOLDER</SvgText>
-              <FlowDot p0={[1150, 820]} c={[1180, 600]} p1={[1330, 560]} start={1.2} phase={0} label="fee" labelSize={15} color="var(--ink)"></FlowDot>
-              <FlowDot p0={[1150, 820]} c={[1180, 600]} p1={[1330, 560]} start={1.2} phase={0.5} label="fee" labelSize={15} color="var(--ink)"></FlowDot>
+              <SvgText x={1830} y={700} size={30} font="var(--font-display)" weight={700} start={1.0}>{ST('s6.holder')}</SvgText>
+              <FlowDot p0={[1150, 820]} c={[1180, 600]} p1={[1330, 560]} start={1.2} phase={0} label={ST('s6.flow.fee')} labelSize={15} color="var(--ink)"></FlowDot>
+              <FlowDot p0={[1150, 820]} c={[1180, 600]} p1={[1330, 560]} start={1.2} phase={0.5} label={ST('s6.flow.fee')} labelSize={15} color="var(--ink)"></FlowDot>
               <FlowDot p0={[1640, 560]} c={[1800, 600]} p1={[1820, 800]} start={1.8} phase={0.25} label="$" color="var(--accent)"></FlowDot>
               <FlowDot p0={[1640, 560]} c={[1800, 600]} p1={[1820, 800]} start={1.8} phase={0.75} label="$" color="var(--accent)"></FlowDot>
             </Seg>
@@ -254,13 +254,13 @@ function Scene6() {
             </Seg>
           </SceneSvg>
           <HandText x={960} y={92} size={56} align="center" font="var(--font-display)" weight={700}
-            start={0.4}>“Yield” ≠ yield</HandText>
+            start={0.4}>{ST('s6.title')}</HandText>
           <HandText x={695} y={186} size={38} align="center" start={5.2} rotate={-1.5} color="var(--bad)"
-            font="var(--font-hand)">printing tokens = diluting you</HandText>
+            font="var(--font-hand)">{ST('s6.left')}</HandText>
           <HandText x={1480} y={186} size={38} align="center" start={13} rotate={1.5} color="var(--accent)"
-            font="var(--font-hand)">someone PAYS for exposure</HandText>
+            font="var(--font-hand)">{ST('s6.right')}</HandText>
         </Cam>
-        <Highlight start={S + 18.6} end={S + 23.7} size={112}>Real yield comes from *real demand.*</Highlight>
+        <Highlight start={S + 18.6} end={S + 23.7} size={112}>{ST('s6.highlight')}</Highlight>
       </SceneWrap>
     </Sprite>
   );

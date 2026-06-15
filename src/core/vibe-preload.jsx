@@ -8,6 +8,7 @@
 // already cached in IndexedDB.
 
 const VIBE_PUBLISHED_TRANSCRIPT_URL = 'assets/transcript.json';
+const VIBE_PUBLISHED_SLIDE_TEXT_URL = 'assets/slide-text.json';
 const VIBE_PUBLISHED_CLIPS_URL = 'assets/narration-clips.zip';
 const VIBE_CLIPS_AUTOLOAD_GUARD = 'vibe-clips-autoload-attempted';
 
@@ -20,6 +21,21 @@ async function vibeFetchPublishedTranscript() {
     if (!j || !Array.isArray(j.lines)) return null;
     console.info(`[vibe] published transcript loaded — ${j.lines.length} lines (${VIBE_PUBLISHED_TRANSCRIPT_URL})`);
     return j;
+  } catch {
+    return null;
+  }
+}
+
+// → published slide-text map ({ key: string }) or null if absent/invalid.
+// A missing file is fine — the slide-text registry falls back to its defaults.
+async function vibeFetchPublishedSlideText() {
+  try {
+    const r = await fetch(VIBE_PUBLISHED_SLIDE_TEXT_URL, { cache: 'no-cache' });
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!j || j.format !== 'vibe-slide-text' || !j.texts || typeof j.texts !== 'object') return null;
+    console.info(`[vibe] published slide text loaded — ${Object.keys(j.texts).length} keys (${VIBE_PUBLISHED_SLIDE_TEXT_URL})`);
+    return j.texts;
   } catch {
     return null;
   }
@@ -56,4 +72,4 @@ async function vibeAutoloadClips(items, voiceId) {
   }
 }
 
-Object.assign(window, { vibeFetchPublishedTranscript, vibeAutoloadClips });
+Object.assign(window, { vibeFetchPublishedTranscript, vibeFetchPublishedSlideText, vibeAutoloadClips });

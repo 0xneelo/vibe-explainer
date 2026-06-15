@@ -172,7 +172,6 @@ function VideoExport({ tlRef, recording, setRecording, engine }) {
             <div style={{ marginTop: 14, fontSize: 12.5, lineHeight: 1.55, color: 'rgba(246,244,239,0.55)' }}>
               Recording starts from the beginning and stops by itself at the end (~4½ min).
               Press Esc to stop early.
-              {engine === 'browser' && ' Heads-up: the browser voice often can’t be captured — switch the narrator engine to ElevenLabs or an imported MP3 for reliable audio.'}
               {engine === 'elevenlabs' && ' Tip: run “Generate narration” first (Console → Narrator) so playback never pauses to fetch audio.'}
             </div>
           </div>

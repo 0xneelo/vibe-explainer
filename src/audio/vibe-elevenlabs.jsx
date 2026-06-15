@@ -2,7 +2,8 @@
 // Generates one MP3 clip per transcript line via the ElevenLabs API, caches
 // clips in IndexedDB (so each line costs credits exactly once), and paces the
 // timeline on the real audio: the playhead holds at a caption's end until its
-// clip finishes playing. Falls back to the browser voice if the API fails.
+// clip finishes playing. If a clip can't be fetched, that line plays silent
+// (no browser speech-synthesis fallback — silence beats the robotic voice).
 //
 // The API key lives ONLY in this browser's localStorage — never in project files.
 
@@ -234,16 +235,12 @@ function ElevenLabsVoiceOver({ items, enabled, apiKey, voiceLabel, rate = 1, mut
           if (playingRef.current) a.play().catch(release);
         })
         .catch(() => {
-          // API failed → browser-voice fallback for this line.
+          // Clip unavailable (e.g. offline / fetch failed) — release the clock
+          // gate so playback continues with no voiceover for this line. We
+          // deliberately do NOT fall back to browser speech synthesis: the
+          // robotic voice is a worse experience than silence.
           if (spokenRef.current !== idx || holdRef.current !== hold) return;
-          if (window.speechSynthesis) {
-            const u = new SpeechSynthesisUtterance(line.text);
-            u.rate = clamp(rateRef.current, 0.5, 2);
-            u.volume = mutedRef.current ? 0 : clamp(volRef.current, 0, 1);
-            u.onend = release;
-            u.onerror = release;
-            speechSynthesis.speak(u);
-          } else release();
+          release();
         });
     }
   }, [time, enabled, playing, items, apiKey, voiceId]);
@@ -405,7 +402,30 @@ function useElCachedCount(items, voiceId) {
   return n;
 }
 
+// Reactive per-line cached-clip flags for the current transcript + voice.
+// Returns boolean[] aligned to items: true = clip ready, false = needs generating.
+function useElLineCached(items, voiceId) {
+  const [flags, setFlags] = React.useState(() => items.map(() => false));
+  React.useEffect(() => {
+    let alive = true;
+    const recount = async () => {
+      const next = [];
+      for (const it of items) {
+        const k = elClipKey(voiceId, it.text);
+        next.push(ELCache.mem.has(k) || !!(await elIdbGet(k)));
+      }
+      if (alive) setFlags(next);
+    };
+    recount();
+    const fn = () => recount();           // re-run whenever the cache changes
+    ELCache.listeners.add(fn);
+    return () => { alive = false; ELCache.listeners.delete(fn); };
+  }, [items, voiceId]);
+  return flags;
+}
+
 Object.assign(window, {
   ElevenLabsVoiceOver, ELNarrationControls, useElApiKey, EL_VOICES, elVoiceId,
   elClipKey, elIdbGet, elIdbPut, ELCache, EL_MODEL, useElCachedCount,
+  useElLineCached, elEnsureClip,
 });
